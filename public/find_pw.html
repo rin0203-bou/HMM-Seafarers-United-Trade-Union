@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>비밀번호 찾기</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .link-text {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #0077b6;
+    }
+    .link-text a {
+      color: #0077b6;
+      text-decoration: none;
+    }
+    .link-text a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="imge/1.png" width="200">
+    <h2>🔐 비밀번호 찾기</h2>
+
+    <form action="/find_pw" method="POST">
+      <input type="email" name="email" placeholder="가입한 이메일을 입력해요" required>
+      <button type="submit">비밀번호 찾기</button>
+    </form>
+
+  
+    <p class="link-text"><a href="login.html">로그인으로 돌아가기</a></p>
+  </div>
+</body>
+</html>

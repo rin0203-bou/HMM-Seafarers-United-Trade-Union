@@ -1,0 +1,34 @@
+[
+  {
+    "ID": "45654286QQ",
+    "password": "789456123",
+    "email": "unknown1@example.com",
+    "name": "이름없음",
+    "joinDate": "2025-08-04",
+    "role": "user"
+  },
+  {
+    "ID": "rin0901",
+    "password": "3579",
+    "email": "unknown2@example.com",
+    "name": "이름없음",
+    "joinDate": "2025-08-04",
+    "role": "user"
+  },
+  {
+    "ID": "33swarfxfd",
+    "password": "321654987",
+    "email": "lee22944257@gmail.com",
+    "name": "이름없음",
+    "joinDate": "2025-08-04",
+    "role": "user"
+  },
+  {
+    "ID": "admin",
+    "password": "admin123",
+    "email": "admin@example.com",
+    "name": "관리자",
+    "joinDate": "2025-01-01",
+    "role": "admin"
+  }
+]

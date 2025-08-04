@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>조합원 게시판</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .hidden-content {
+      display: none;
+      color: #555;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .locked-title {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container fade-in">
+    <img src="imge/1.png" width="200">
+
+    <div class="form-box">
+      <form id="postForm" enctype="multipart/form-data">
+        <input type="text" id="title" placeholder="제목을 입력하세요" required />
+
+        <textarea id="content" placeholder="내용을 입력하세요" rows="5" style="resize: none; padding: 12px; border: 1px solid #90caf9; border-radius: 12px; font-size: 14px;"></textarea>
+        
+        <input type="file" id="imageUpload" accept="image/*" />
+        
+        <label style="font-size: 14px; color: #0077b6; margin-top: 10px;">
+          <input type="checkbox" id="privatePost" />
+          나만 보기
+        </label>
+
+        <button type="submit">작성하기</button>
+      </form>
+    </div>
+
+    <div class="form-box" style="margin-top: 20px;">
+      <h3 style="color: #0077b6; margin-bottom: 10px;">📌 게시글 목록</h3>
+      <div id="postList" style="text-align: left; font-size: 14px;">
+        <p>아직 게시글이 없습니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('postForm');
+    const postList = document.getElementById('postList');
+
+    // 글 작성 시 서버에 저장
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const title = document.getElementById('title').value;
+      const content = document.getElementById('content').value;
+      const isPrivate = document.getElementById('privatePost').checked;
+
+      const formData = new URLSearchParams();
+      formData.append('title', title);
+      formData.append('content', content);
+      if (isPrivate) formData.append('private', 'on');
+
+      try {
+        const res = await fetch('/post', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: formData
+        });
+
+        if (!res.ok) {
+          alert('❗ 게시글 작성 실패: 로그인 되어 있지 않거나 서버 오류');
+          return;
+        }
+
+        await loadPosts();  // 글 작성 후 목록 갱신
+        form.reset();
+      } catch (err) {
+        alert('❗ 네트워크 오류: ' + err.message);
+      }
+    });
+
+    // 게시글 목록 불러오기
+    async function loadPosts() {
+      try {
+        const res = await fetch('/posts');
+        if (!res.ok) {
+          postList.innerHTML = '<p>📛 로그인 후 게시글을 볼 수 있습니다.</p>';
+          return;
+        }
+
+        const posts = await res.json();
+        postList.innerHTML = '';
+
+        if (posts.length === 0) {
+          postList.innerHTML = '<p>아직 게시글이 없습니다.</p>';
+          return;
+        }
+
+        posts.slice(0, 2).forEach(post => {
+          const postDiv = document.createElement('div');
+          postDiv.style.marginBottom = '20px';
+          postDiv.style.paddingBottom = '10px';
+          postDiv.style.borderBottom = '1px solid #ccc';
+
+          if (post.private) {
+            const titleElem = document.createElement('strong');
+            titleElem.className = 'locked-title';
+            titleElem.innerHTML = `🔒 ${post.title}`;
+            titleElem.addEventListener('click', () => {
+              const msg = postDiv.querySelector('.hidden-content');
+              msg.style.display = msg.style.display === 'none' ? 'block' : 'none';
+            });
+
+            const message = document.createElement('div');
+            message.className = 'hidden-content';
+            message.textContent = post.content;
+
+            postDiv.appendChild(titleElem);
+            postDiv.appendChild(message);
+          } else {
+            postDiv.innerHTML = `<strong>${post.title}</strong><br><p>${post.content}</p>`;
+          }
+
+          postList.appendChild(postDiv);
+        });
+
+      } catch (err) {
+        postList.innerHTML = '<p>⚠️ 게시글을 불러오지 못했습니다.</p>';
+      }
+    }
+
+    // 페이지 로드시 게시글 자동 로딩
+    window.addEventListener('DOMContentLoaded', loadPosts);
+  </script>
+</body>
+</html>

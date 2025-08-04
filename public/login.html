@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인 페이지</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .link-text {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #0077b6;
+    }
+
+    .link-text a {
+      color: #0077b6;
+      text-decoration: none;
+    }
+
+    .link-text a:hover {
+      text-decoration: underline;
+    }
+
+    .small-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .small-links a {
+      color: #0077b6;
+      text-decoration: none;
+    }
+
+    .small-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="imge/1.png"
+    width="200">
+    <h2>🌊 로그인 🌊</h2>
+
+    <form action="/login" method="POST">
+   <input type="text" name="ID" placeholder="아이디를 입력해요" required>
+  <input type="password" name="password" placeholder="비밀번호를 입력해요" required>
+  <button type="submit">로그인</button>
+   </form>
+
+    <!-- 아이디/비밀번호 찾기 링크 -->
+    <div class="small-links">
+      <a href="find_id.html">아이디 찾기</a>
+      <a href="find_pw.html">비밀번호 찾기</a>
+    </div>
+
+    <!-- 회원가입 페이지로 이동하는 링크 -->
+    <p class="link-text">처음이신가요? <a href="signup.html">회원가입 하러가기</a></p>
+
+  </div>
+</body>
+</html>

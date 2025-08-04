@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>회원가입 페이지</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <img src="imge/1.png" width="200">
+    <h2>🌊 회원가입 🌊</h2>
+
+    <form action="/signup" method="POST">
+      <label for="userID" class="visually-hidden"></label>
+      <input type="text" id="userID" name="ID" placeholder="아이디를 입력해요" required>
+
+      <input type="password" name="password" placeholder="비밀번호를 입력해요" required>
+
+      
+      <input type="email" name="email" placeholder="이메일을 입력해요" required>
+
+      <button type="submit">회원가입</button>
+    </form>
+
+    <p class="link-text">이미 계정이 있으신가요? <a href="login.html">로그인 하러가기</a></p>
+  </div>
+</body>
+</html>
+

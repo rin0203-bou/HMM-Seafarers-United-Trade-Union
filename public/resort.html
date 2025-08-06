@@ -79,6 +79,22 @@ button:hover {
   font-weight: bold;
   display: none;
 }
+
+.main-btn {
+  margin-top: 16px;
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 14px;
+}
+
+.main-btn:hover {
+  background-color: #0097a7;
+}
   </style>
 </head>
 <body>
@@ -109,6 +125,8 @@ button:hover {
     </form>
 
     <div class="success" id="successMessage">신청이 완료되었습니다! 📩</div>
+
+    <button class="main-btn" onclick="location.href='main.html'">🏠 메인으로 가기</button>
   </div>
 
   <script>

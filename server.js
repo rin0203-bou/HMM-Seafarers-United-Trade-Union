@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -29,29 +30,6 @@ app.use(sessionMiddleware);
 // Socket.IO에도 세션 연결
 io.use(sharedSession(sessionMiddleware, { autoSave: true }));
 
-// ✅ Socket.IO 채팅 기능 (세션 연동)
-io.on("connection", (socket) => {
-  const user = socket.handshake.session.user;
-
-  if (!user) {
-    console.log("🚫 비로그인 유저 차단");
-    socket.disconnect();
-    return;
-  }
-
-  console.log(`✅ 로그인 유저 접속: ${user.ID}`);
-
-  socket.on("chat message", (msg) => {
-    const message = { user: user.ID, text: msg };
-    console.log("💬 메세지:", message);
-    io.emit("chat message", message); // 모든 클라이언트에게 메시지 전송
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`❌ ${user.ID} 나감`);
-  });
-});
-
 // 파일 없을 경우 초기화
 if (!fs.existsSync(usersFile)) fs.writeFileSync(usersFile, JSON.stringify([], null, 2));
 if (!fs.existsSync(postsFile)) fs.writeFileSync(postsFile, JSON.stringify([], null, 2));
@@ -62,6 +40,13 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname)); // 이미지 파일 접근 가능
 
+// 🔐 부서 비밀번호
+const departmentPasswords = {
+  "총무팀": "1111",
+  "인사팀": "2222",
+  "회계팀": "3333"
+};
+
 // ✅ 회원가입
 app.post('/signup', (req, res) => {
   const { ID, password, email } = req.body;
@@ -71,7 +56,7 @@ app.post('/signup', (req, res) => {
     return res.send('<h3>이미 존재하는 아이디입니다.</h3><a href="/signup.html">돌아가기</a>');
   }
 
-  users.push({ ID, password, email, role: 'user' });
+  users.push({ ID, password, email, role: 'user', team: "" });
   fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
   res.send('<h2>🎉 회원가입이 완료되었습니다!</h2><a href="/login.html">로그인하기</a>');
 });
@@ -160,12 +145,86 @@ app.get('/members', (req, res) => {
   res.json(users);
 });
 
+// ✅ 부서 입장 (비밀번호 확인)
+app.post('/join-department', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, error: '로그인 필요' });
+  }
+  const { name, password } = req.body;
+  const ok = departmentPasswords[name] && departmentPasswords[name] === password;
+  if (!ok) return res.json({ success: false });
+
+  req.session.currentDept = name;
+  return res.json({ success: true });
+});
+
+// ✅ 팀별 채팅 목록
+app.get('/chat', (req, res) => {
+  if (!req.session.user) return res.status(401).send('로그인 필요');
+  const users = JSON.parse(fs.readFileSync(usersFile, 'utf-8'));
+  const dept = req.session.currentDept || req.session.user.team; 
+  const list = dept ? users.filter(u => u.team === dept) : [];
+  res.json(list);
+});
+
 // ✅ 기본 경로
 app.get('/', (req, res) => {
   res.redirect('/login.html');
 });
 
-// ✅ 서버 실행 (Socket.IO 포함)
+// ===================== Socket.IO ===================== //
+
+// ✅ 팀별 채팅
+io.on("connection", (socket) => {
+  const sess = socket.handshake.session;
+  const user = sess?.user;
+
+  if (!user) {
+    console.log("🚫 비로그인 유저 차단");
+    socket.disconnect();
+    return;
+  }
+
+  const dept = socket.handshake.query?.dept;
+
+  if (!dept || !sess.currentDept || sess.currentDept !== dept) {
+    socket.emit("error", "부서 입장 인증이 필요합니다.");
+    socket.disconnect();
+    return;
+  }
+
+  socket.join(dept);
+  console.log(`✅ 로그인 유저 접속: ${user.ID} / 방: ${dept}`);
+
+  socket.on("chat message", (msg) => {
+    const message = { user: user.ID, text: msg, dept, at: Date.now() };
+    io.to(dept).emit("chat message", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`❌ ${user.ID} 나감 (방: ${dept})`);
+  });
+});
+
+// ✅ 문의 채팅 (로그인 불필요)
+const support = io.of("/support");
+support.on("connection", (socket) => {
+  const sess = socket.handshake.session;
+  const nick = sess?.user?.ID || `Guest${Math.floor(Math.random()*9000+1000)}`;
+
+  console.log(`🆘 문의 채팅 접속: ${nick}`);
+
+  socket.on("chat message", (msg) => {
+    const message = { user: nick, text: msg, at: Date.now() };
+    support.emit("chat message", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`🆘 문의 채팅 종료: ${nick}`);
+  });
+});
+
+// ===================== 서버 실행 ===================== //
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ 서버 실행 중: http://localhost:${PORT}`);
 });

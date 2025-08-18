@@ -1,1 +1,72 @@
-<title> 회계팀 </title>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>회계팀 채팅</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body { margin:0; padding:0; font-family:'Segoe UI',sans-serif; background:#fff3e0; display:flex; justify-content:center; align-items:center; height:100vh; }
+    .chat-container { background:rgba(255,255,255,0.95); border-radius:20px; padding:20px; width:500px; max-width:90%; height:80%; display:flex; flex-direction:column; box-shadow:0 8px 20px rgba(0,0,0,0.2); }
+    h2 { text-align:center; color:#f57c00; margin-bottom:15px; }
+    .messages { flex:1; overflow-y:auto; border:1px solid #ccc; border-radius:12px; padding:10px; background:#fff8e1; margin-bottom:15px; }
+    .messages p { margin:5px 0; word-wrap:break-word; }
+    .my-msg { color:#f57c00; font-weight:bold; }
+    .other-msg { color:#555; }
+    .input-box { display:flex; gap:10px; }
+    .input-box input { flex:1; padding:10px; border-radius:12px; border:1px solid #ccc; font-size:16px; }
+    .input-box button { padding:10px 20px; border-radius:12px; border:none; background-color:#f57c00; color:white; font-size:16px; cursor:pointer; transition:0.3s; }
+    .input-box button:hover { background-color:#ef6c00; transform:translateY(-2px); }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h2>회계팀 채팅</h2>
+    <div class="messages" id="messages"></div>
+    <div class="input-box">
+      <input id="msgInput" type="text" placeholder="메시지를 입력하세요">
+      <button id="sendBtn">전송</button>
+    </div>
+  </div>
+
+  <script>
+    const dept = "회계팀";
+    const socket = io({ query: { dept } });
+    const messages = document.getElementById("messages");
+    const input = document.getElementById("msgInput");
+    const btn = document.getElementById("sendBtn");
+
+    function addMessage(msg) {
+      const p = document.createElement("p");
+      p.innerHTML = `<span class="${msg.user === dept ? 'my-msg' : 'other-msg'}">${msg.user}:</span> ${msg.text}`;
+      messages.appendChild(p);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    btn.addEventListener("click", () => {
+      const text = input.value.trim();
+      if (!text) return;
+      socket.emit("chat message", text);
+      input.value = "";
+    });
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") btn.click();
+    });
+
+    socket.on("chat message", addMessage);
+    socket.on("error", err => { alert(err); window.location.href = "/"; });
+  </script>
+
+<div class="input-box">
+  <input id="msgInput" type="text" placeholder="메시지를 입력하세요">
+  <button id="sendBtn">전송</button>
+</div>
+
+<!-- 홈 버튼 추가 -->
+<div style="text-align:center; margin-top:10px;">
+  <button class="main-btn" onclick="location.href='member.html'" style="
+    padding:10px 20px; border-radius:12px; border:none; background-color:#0288d1; color:white; font-size:16px; cursor:pointer; transition:0.3s;
+  ">채팅 끝내기</button>
+</div>
+</body>
+</html>

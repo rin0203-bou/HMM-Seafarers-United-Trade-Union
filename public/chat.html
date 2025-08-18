@@ -44,8 +44,8 @@
 
     .form-box {
       display: flex;
-      flex-direction: column; /* 세로 배치 */
-      gap: 15px; /* 버튼 사이 간격 */
+      flex-direction: column;
+      gap: 15px;
     }
 
     button {
@@ -65,6 +65,40 @@
       transform: translateY(-3px);
       box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
     }
+
+    /* 모달 스타일 */
+    .modal {
+      display: none;
+      position: fixed;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      width: 300px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .modal-content input {
+      width: 90%;
+      padding: 10px;
+      margin: 15px 0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .modal-content button {
+      width: 45%;
+      margin: 5px;
+    }
   </style>
 </head>
 <body>
@@ -72,10 +106,83 @@
     <img src="imge/1.png" alt="고래 아이콘">
     <h2>어디 채팅으로 가시겠습니까?</h2>
     <div class="form-box">
-      <button onclick="location.href='general affairs team.html'">🗂️ 총무팀</button>
-      <button onclick="location.href='personnel team.html'">👥 인사팀</button>
-      <button onclick="location.href='accounting team.html'">💰 회계팀</button>
+      <button onclick="openModal('총무팀')">🗂️ 총무팀</button>
+      <button onclick="openModal('인사팀')">👥 인사팀</button>
+      <button onclick="openModal('회계팀')">💰 회계팀</button>
+      <button onclick="location.href='support.html'">💡 문의하기 (로그인 불필요)</button>
     </div>
   </div>
+
+  <!-- 비밀번호 입력 모달 -->
+  <div class="modal" id="passwordModal" role="dialog" aria-labelledby="deptName">
+    <div class="modal-content">
+      <h3 id="deptName">부서명</h3>
+      <input type="password" id="deptPassword" placeholder="비밀번호 입력">
+      <br>
+      <button onclick="checkPassword()">입장</button>
+      <button onclick="closeModal()">취소</button>
+    </div>
+  </div>
+
+  <script>
+    let selectedDept = "";
+
+    function openModal(dept) {
+      selectedDept = dept;
+      document.getElementById("deptName").innerText = dept + " 입장";
+      document.getElementById("passwordModal").style.display = "flex";
+      document.getElementById("deptPassword").focus(); // ✅ 자동 포커스
+    }
+
+    function closeModal() {
+      document.getElementById("passwordModal").style.display = "none";
+      document.getElementById("deptPassword").value = "";
+    }
+
+    async function checkPassword() {
+      const password = document.getElementById("deptPassword").value;
+
+      try {
+        const res = await fetch("/join-department", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: selectedDept, password })
+        });
+
+        if (!res.ok) throw new Error("네트워크 오류");
+
+        const data = await res.json();
+        if (data.success) {
+          location.href = `chatroom.html?dept=${encodeURIComponent(selectedDept)}`;
+        } else {
+          alert("비밀번호가 틀렸습니다!");
+        }
+      } catch (err) {
+        alert("서버 오류 발생");
+        console.error(err);
+      }
+    }
+
+    // ✅ 엔터키로 비밀번호 제출
+    document.getElementById("deptPassword").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") checkPassword();
+    });
+
+    // ✅ ESC 키로 모달 닫기
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Escape") closeModal();
+    });
+  </script>
+  <div class="input-box">
+  <input id="msgInput" type="text" placeholder="메시지를 입력하세요">
+  <button id="sendBtn">전송</button>
+</div>
+
+<!-- 홈 버튼 추가 -->
+<div style="text-align:center; margin-top:10px;">
+  <button class="main-btn" onclick="location.href='member.html'" style="
+    padding:10px 20px; border-radius:12px; border:none; background-color:#0288d1; color:white; font-size:16px; cursor:pointer; transition:0.3s;
+  ">🏠 홈화면으로 가기</button>
+</div>
 </body>
 </html>

@@ -5,7 +5,17 @@
     "email": "unknown1@example.com",
     "name": "이름없음",
     "joinDate": "2025-08-04",
-    "role": "user"
+    "role": "user",
+    "team": "총무팀"
+  },
+  {
+    "ID": "user_chongmu2",
+    "password": "111111",
+    "email": "chongmu2@example.com",
+    "name": "총무부원2",
+    "joinDate": "2025-08-18",
+    "role": "user",
+    "team": "총무팀"
   },
   {
     "ID": "rin0901",
@@ -13,7 +23,17 @@
     "email": "unknown2@example.com",
     "name": "이름없음",
     "joinDate": "2025-08-04",
-    "role": "user"
+    "role": "user",
+    "team": "회계팀"
+  },
+  {
+    "ID": "user_account2",
+    "password": "222222",
+    "email": "account2@example.com",
+    "name": "회계부원2",
+    "joinDate": "2025-08-18",
+    "role": "user",
+    "team": "회계팀"
   },
   {
     "ID": "33swarfxfd",
@@ -21,7 +41,17 @@
     "email": "lee22944257@gmail.com",
     "name": "이름없음",
     "joinDate": "2025-08-04",
-    "role": "user"
+    "role": "user",
+    "team": "인사팀"
+  },
+  {
+    "ID": "user_hr2",
+    "password": "333333",
+    "email": "hr2@example.com",
+    "name": "인사부원2",
+    "joinDate": "2025-08-18",
+    "role": "user",
+    "team": "인사팀"
   },
   {
     "ID": "admin",
@@ -29,6 +59,16 @@
     "email": "admin@example.com",
     "name": "관리자",
     "joinDate": "2025-01-01",
-    "role": "admin"
+    "role": "admin",
+    "team": "A"
+  },
+  {
+    "ID": "admin_sub",
+    "password": "444444",
+    "email": "admin2@example.com",
+    "name": "부관리자",
+    "joinDate": "2025-08-18",
+    "role": "admin",
+    "team": "A"
   }
 ]

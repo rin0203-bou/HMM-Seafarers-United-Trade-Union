@@ -27,14 +27,14 @@ const sessionMiddleware = session({
 app.use(sessionMiddleware);
 
 // Socket.IO에도 세션 연결
-io.use(sharedSession(sessionMiddleware, {
-  autoSave:true
-}));
+io.use(sharedSession(sessionMiddleware, { autoSave: true }));
 
+// ✅ Socket.IO 채팅 기능 (세션 연동)
 io.on("connection", (socket) => {
   const user = socket.handshake.session.user;
+
   if (!user) {
-    console.log("비로그인 유저 차단");
+    console.log("🚫 비로그인 유저 차단");
     socket.disconnect();
     return;
   }
@@ -43,11 +43,12 @@ io.on("connection", (socket) => {
 
   socket.on("chat message", (msg) => {
     const message = { user: user.ID, text: msg };
-    io.emit("chat message", message);
+    console.log("💬 메세지:", message);
+    io.emit("chat message", message); // 모든 클라이언트에게 메시지 전송
   });
 
   socket.on("disconnect", () => {
-    console.log(`${user.ID} 나감`);
+    console.log(`❌ ${user.ID} 나감`);
   });
 });
 
@@ -60,13 +61,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname)); // 이미지 파일 접근 가능
-
-// 세션 설정
-app.use(session({
-  secret: 'my-secret',
-  resave: false,
-  saveUninitialized: true
-}));
 
 // ✅ 회원가입
 app.post('/signup', (req, res) => {
@@ -169,21 +163,6 @@ app.get('/members', (req, res) => {
 // ✅ 기본 경로
 app.get('/', (req, res) => {
   res.redirect('/login.html');
-});
-
-
-// 🔥 여기서부터 채팅 기능 추가
-io.on("connection", (socket) => {
-  console.log("사용자 접속");
-
-  socket.on("chat message", (msg) => {
-    console.log("메세지:", msg);
-    io.emit("chat message", msg); // 모든 클라이언트에게 메시지 전송
-  });
-
-  socket.on("disconnect", () => {
-    console.log("사용자 나감");
-  });
 });
 
 // ✅ 서버 실행 (Socket.IO 포함)

@@ -17,10 +17,28 @@
     .link-text a:hover {
       text-decoration: underline;
     }
+
+    .back-btn {
+      padding: 10px 20px;
+      background-color: #0096c7;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-bottom: 20px;
+    }
+
+    .back-btn:hover {
+      background-color: #0077b6;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <button class="back-btn" onclick="history.back()">← 이전으로</button>
+
     <img src="imge/1.png" width="200">
     <h2>🔐 비밀번호 찾기</h2>
 
@@ -29,7 +47,6 @@
       <button type="submit">비밀번호 찾기</button>
     </form>
 
-  
     <p class="link-text"><a href="login.html">로그인으로 돌아가기</a></p>
   </div>
 </body>

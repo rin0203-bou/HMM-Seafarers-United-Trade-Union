@@ -17,22 +17,39 @@
     .link-text a:hover {
       text-decoration: underline;
     }
+
+    .back-btn {
+      padding: 10px 20px;
+      background-color: #0096c7;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-bottom: 20px;
+    }
+
+    .back-btn:hover {
+      background-color: #0077b6;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="imge/1.png"
-    width="200">
+    <button class="back-btn" onclick="history.back()">← 이전으로</button>
+
+    <img src="imge/1.png" width="200">
     <h2>🔎 아이디 찾기</h2>
 
     <form action="/find_id" method="POST">
-  <input type="email" name="email" placeholder="가입한 이메일을 입력해요" required>
-  <button type="submit">아이디 찾기</button>
-</form>
+      <input type="email" name="email" placeholder="가입한 이메일을 입력해요" required>
+      <button type="submit">아이디 찾기</button>
+    </form>
 
-<div id="result">
-  
-</div>
+    <div id="result">
+      <!-- 서버 응답 결과가 여기에 표시됨 -->
+    </div>
 
     <p class="link-text"><a href="login.html">로그인으로 돌아가기</a></p>
   </div>

@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>조합원 채팅방</title>
+  <title>채팅메뉴</title>
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
       margin: 0;
@@ -16,114 +17,65 @@
     }
 
     .container {
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255, 255, 255, 0.95);
       border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      width: 400px;
-      display: flex;
-      flex-direction: column;
-      height: 500px;
+      padding: 40px 30px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      width: 340px;
+    }
+
+    .container img {
+      width: 100px;
+      margin-bottom: 15px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
     h2 {
       color: #0077b6;
-      margin-bottom: 10px;
-      text-align: center;
+      font-size: 20px;
+      margin-bottom: 25px;
     }
 
-    #messages {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    #messages li {
-      margin: 8px 0;
-      padding: 10px;
-      border-radius: 12px;
-      max-width: 70%;
-      word-wrap: break-word;
-    }
-
-    .me {
-      background: #0288d1;
-      color: white;
-      margin-left: auto;
-      text-align: right;
-    }
-
-    .other {
-      background: #e1f5fe;
-      color: #0277bd;
-      margin-right: auto;
-      text-align: left;
-    }
-
-    form {
+    .form-box {
       display: flex;
-      margin-top: 10px;
-    }
-
-    input {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #90caf9;
-      border-radius: 12px;
-      font-size: 14px;
-      box-sizing: border-box;
+      flex-direction: column; /* 세로 배치 */
+      gap: 15px; /* 버튼 사이 간격 */
     }
 
     button {
       background-color: #0288d1;
       color: white;
-      padding: 12px 20px;
+      padding: 14px;
       border: none;
       border-radius: 12px;
       font-size: 16px;
       cursor: pointer;
-      margin-left: 8px;
+      transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     button:hover {
       background-color: #0277bd;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>💬 조합원 채팅방</h2>
-    <ul id="messages"></ul>
-    <form id="chat-form">
-      <input id="m" autocomplete="off" placeholder="메시지를 입력하세요..." />
-      <button>전송</button>
-    </form>
+    <img src="imge/1.png" alt="고래 아이콘">
+    <h2>어디 채팅으로 가시겠습니까?</h2>
+    <div class="form-box">
+      <button onclick="location.href='general affairs team.html'">🗂️ 총무팀</button>
+      <button onclick="location.href='personnel team.html'">👥 인사팀</button>
+      <button onclick="location.href='accounting team.html'">💰 회계팀</button>
+    </div>
   </div>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const form = document.getElementById("chat-form");
-    const input = document.getElementById("m");
-    const messages = document.getElementById("messages");
-
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-      if (input.value) {
-        socket.emit("chat message", input.value);
-        input.value = "";
-      }
-    });
-
-    socket.on("chat message", function(msg) {
-      const li = document.createElement("li");
-      li.textContent = msg.user + ": " + msg.text;
-      li.className = msg.user === socket.id ? "me" : "other";
-      messages.appendChild(li);
-      messages.scrollTop = messages.scrollHeight;
-    });
-  </script>
 </body>
 </html>

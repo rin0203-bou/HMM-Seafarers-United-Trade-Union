@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>조합원 메뉴</title>
-  <link rel="stylesheet" href="style.css">
   <style>
     body {
       margin: 0;
@@ -26,15 +25,6 @@
     h2 {
       color: #0077b6;
       margin-bottom: 20px;
-    }
-    .whale-icon {
-      width: 80px;
-      margin-bottom: 10px;
-      animation: float 3s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
     }
     .form-box {
       display: flex;
@@ -59,15 +49,13 @@
 </head>
 <body>
   <div class="container">
-    <img src="imge/1.png"
-     width="200">
-     
+    <img src="imge/1.png" width="200">
     <h2>🎉 환영합니다, 조합원님!</h2>
     <div class="form-box">
       <button onclick="location.href='board.html'">📋 게시판</button>
       <button onclick="location.href='resort.html'">🏖 리조트 신청</button>
-      <button onclick="location.href='main.html'">🚪 로그아웃</button>
       <button onclick="location.href='chat.html'">💬 팀별 채팅</button>
+      <button onclick="location.href='main.html'">🚪 로그아웃</button>
     </div>
   </div>
 </body>

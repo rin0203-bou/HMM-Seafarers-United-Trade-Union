@@ -3,13 +3,53 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
 const fs = require('fs');
+const http = require('http');
+const { Server } = require('socket.io');
+const sharedSession = require("express-socket.io-session");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// HTTP 서버와 Socket.IO 서버 연결
+const server = http.createServer(app);
+const io = new Server(server);
+
 // 데이터 파일 경로
 const usersFile = path.join(__dirname, 'users.json');
 const postsFile = path.join(__dirname, 'posts.json');
+
+// 세션 미들웨어
+const sessionMiddleware = session({
+  secret: 'my-secret',
+  resave: false,
+  saveUninitialized: true
+});
+app.use(sessionMiddleware);
+
+// Socket.IO에도 세션 연결
+io.use(sharedSession(sessionMiddleware, {
+  autoSave:true
+}));
+
+io.on("connection", (socket) => {
+  const user = socket.handshake.session.user;
+  if (!user) {
+    console.log("비로그인 유저 차단");
+    socket.disconnect();
+    return;
+  }
+
+  console.log(`✅ 로그인 유저 접속: ${user.ID}`);
+
+  socket.on("chat message", (msg) => {
+    const message = { user: user.ID, text: msg };
+    io.emit("chat message", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`${user.ID} 나감`);
+  });
+});
 
 // 파일 없을 경우 초기화
 if (!fs.existsSync(usersFile)) fs.writeFileSync(usersFile, JSON.stringify([], null, 2));
@@ -19,7 +59,7 @@ if (!fs.existsSync(postsFile)) fs.writeFileSync(postsFile, JSON.stringify([], nu
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(__dirname)); // 이미지 파일도 접근 가능하게
+app.use(express.static(__dirname)); // 이미지 파일 접근 가능
 
 // 세션 설정
 app.use(session({
@@ -131,7 +171,22 @@ app.get('/', (req, res) => {
   res.redirect('/login.html');
 });
 
-// ✅ 서버 실행
-app.listen(PORT, '0.0.0.0', () => {
+
+// 🔥 여기서부터 채팅 기능 추가
+io.on("connection", (socket) => {
+  console.log("사용자 접속");
+
+  socket.on("chat message", (msg) => {
+    console.log("메세지:", msg);
+    io.emit("chat message", msg); // 모든 클라이언트에게 메시지 전송
+  });
+
+  socket.on("disconnect", () => {
+    console.log("사용자 나감");
+  });
+});
+
+// ✅ 서버 실행 (Socket.IO 포함)
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ 서버 실행 중: http://localhost:${PORT}`);
 });

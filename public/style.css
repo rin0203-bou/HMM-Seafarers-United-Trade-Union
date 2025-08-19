@@ -80,6 +80,11 @@ button:hover {
   color: #0077b6;
 }
 
+.container {
+  max-height: 90vh;
+  overflow-y: auto;
+  }
+
 .link-text a {
   color: #0077b6;
   text-decoration: none;
@@ -88,3 +93,4 @@ button:hover {
 .link-text a:hover {
   text-decoration: underline;
 }
+

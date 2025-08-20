@@ -224,6 +224,14 @@ support.on("connection", (socket) => {
   });
 });
 
+// ✅ 현재 부서 반환 API
+app.get("/get-current-dept", (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: "로그인 필요" });
+  }
+  res.json({ dept: req.session.currentDept || null });
+});
+
 // ===================== 서버 실행 ===================== //
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ 서버 실행 중: http://localhost:${PORT}`);

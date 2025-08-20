@@ -21,6 +21,8 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       text-align: center;
       width: 320px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
     h2 {
       color: #0077b6;
@@ -45,12 +47,6 @@
       background-color: #0277bd;
       transform: scale(1.03);
     }
-
-    .container {
-  max-height: 90vh;
-  overflow-y: auto;
-  }
-  
   </style>
 </head>
 <body>
@@ -60,9 +56,29 @@
     <div class="form-box">
       <button onclick="location.href='board.html'">📋 게시판</button>
       <button onclick="location.href='resort.html'">🏖 리조트 신청</button>
-      <button onclick="location.href='chat.html'">💬 채팅</button>
+      <button onclick="location.href='chat.html'">💬 팀 채팅</button>
+      <button onclick="location.href='support.html'">🆘 문의 채팅</button>
       <button onclick="location.href='main.html'">🚪 로그아웃</button>
     </div>
   </div>
+
+  <script>
+async function goChat() {
+  try {
+    const res = await fetch("/get-current-dept"); // 현재 세션에서 부서 가져오기
+    if (!res.ok) throw new Error("로그인 필요");
+    const data = await res.json();
+    if (!data.dept) {
+      alert("부서에 먼저 입장해야 합니다!");
+      return;
+    }
+    // 자동으로 chat.html?dept=부서명 으로 이동
+    location.href = `chat.html?dept=${encodeURIComponent(data.dept)}`;
+  } catch (e) {
+    alert("로그인이 필요합니다.");
+    location.href = "login.html";
+  }
+}
+</script>
 </body>
 </html>

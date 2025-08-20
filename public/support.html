@@ -2,19 +2,19 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>팀 채팅</title>
+  <title>문의 채팅</title>
   <script src="/socket.io/socket.io.js"></script>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom, #b2ebf2, #81d4fa, #4fc3f7);
+      background: linear-gradient(to bottom, #c8e6c9, #a5d6a7, #81c784);
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
     header {
-      background: #0288d1;
+      background: #388e3c;
       color: white;
       padding: 15px;
       text-align: center;
@@ -50,30 +50,25 @@
       padding: 10px 20px;
       border: none;
       border-radius: 8px;
-      background: #0288d1;
+      background: #388e3c;
       color: white;
       cursor: pointer;
     }
     button:hover {
-      background: #0277bd;
+      background: #2e7d32;
     }
   </style>
 </head>
 <body>
-  <header>💬 팀 채팅방</header>
+  <header>🆘 문의 채팅 (게스트 가능)</header>
   <ul id="messages"></ul>
   <form id="form">
-    <input id="input" autocomplete="off" placeholder="메시지를 입력하세요..." />
+    <input id="input" autocomplete="off" placeholder="문의 내용을 입력하세요..." />
     <button>전송</button>
   </form>
 
   <script>
-    // 세션에서 현재 부서명 가져오기 (백엔드에서 req.session.currentDept 사용)
-    // 여기서는 querystring으로 dept 전달
-    const params = new URLSearchParams(window.location.search);
-    const dept = params.get("dept");
-
-    const socket = io({ query: { dept } });
+    const socket = io("/support");
 
     const form = document.getElementById('form');
     const input = document.getElementById('input');

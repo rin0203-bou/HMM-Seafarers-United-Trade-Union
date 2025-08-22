@@ -167,9 +167,11 @@ app.get('/chat', (req, res) => {
   res.json(list);
 });
 
-// ✅ 기본 경로
+const path = require("path");
+
+// ✅ 기본 경로는 main.html (포털 화면)
 app.get('/', (req, res) => {
-  res.redirect('/login.html');
+  res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
 // ===================== Socket.IO ===================== //

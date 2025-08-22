@@ -24,7 +24,7 @@
     "name": "이름없음",
     "joinDate": "2025-08-04",
     "role": "user",
-    "team": "회계팀"
+    "team": "총무팀"
   },
   {
     "ID": "user_account2",
@@ -33,7 +33,7 @@
     "name": "회계부원2",
     "joinDate": "2025-08-18",
     "role": "user",
-    "team": "회계팀"
+    "team": "총무팀"
   },
   {
     "ID": "33swarfxfd",
@@ -42,7 +42,7 @@
     "name": "이름없음",
     "joinDate": "2025-08-04",
     "role": "user",
-    "team": "인사팀"
+    "team": "총무팀"
   },
   {
     "ID": "user_hr2",
@@ -51,7 +51,7 @@
     "name": "인사부원2",
     "joinDate": "2025-08-18",
     "role": "user",
-    "team": "인사팀"
+    "team": "총무팀"
   },
   {
     "ID": "admin",

@@ -167,12 +167,6 @@ app.get('/chat', (req, res) => {
   res.json(list);
 });
 
-const path = require("path");
-
-// ✅ 기본 경로는 main.html (포털 화면)
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'main.html'));
-});
 
 // ===================== Socket.IO ===================== //
 
@@ -232,6 +226,11 @@ app.get("/get-current-dept", (req, res) => {
     return res.status(401).json({ error: "로그인 필요" });
   }
   res.json({ dept: req.session.currentDept || null });
+});
+
+// ✅ 기본 경로는 main.html (포털 화면)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
 // ===================== 서버 실행 ===================== //

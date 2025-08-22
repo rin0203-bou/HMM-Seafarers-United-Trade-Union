@@ -34,9 +34,16 @@ io.use(sharedSession(sessionMiddleware, { autoSave: true }));
 if (!fs.existsSync(usersFile)) fs.writeFileSync(usersFile, JSON.stringify([], null, 2));
 if (!fs.existsSync(postsFile)) fs.writeFileSync(postsFile, JSON.stringify([], null, 2));
 
-// 미들웨어 설정
+// ===================== 미들웨어 ===================== //
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// ✅ 기본 경로는 main.html (포털 화면) → 반드시 static보다 위에 있어야 함
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'main.html'));
+});
+
+// ✅ 정적 파일 제공 (CSS, JS, 이미지 등)
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(__dirname)); // 이미지 파일 접근 가능
 
@@ -167,7 +174,6 @@ app.get('/chat', (req, res) => {
   res.json(list);
 });
 
-
 // ===================== Socket.IO ===================== //
 
 // ✅ 팀별 채팅
@@ -226,11 +232,6 @@ app.get("/get-current-dept", (req, res) => {
     return res.status(401).json({ error: "로그인 필요" });
   }
   res.json({ dept: req.session.currentDept || null });
-});
-
-// ✅ 기본 경로는 main.html (포털 화면)
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
 // ===================== 서버 실행 ===================== //

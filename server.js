@@ -38,7 +38,7 @@ if (!fs.existsSync(postsFile)) fs.writeFileSync(postsFile, JSON.stringify([], nu
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// ✅ 기본 경로는 main.html (포털 화면) → 반드시 static보다 위에 있어야 함
+// ✅ 기본 경로는 main.html (포털 화면)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
@@ -208,21 +208,50 @@ io.on("connection", (socket) => {
   });
 });
 
-// ✅ 문의 채팅 (로그인 불필요)
+// ===================== 문의 채팅 (게스트/조합원/관리자) ===================== //
 const support = io.of("/support");
+let supportRooms = {};
+
 support.on("connection", (socket) => {
   const sess = socket.handshake.session;
-  const nick = sess?.user?.ID || `Guest${Math.floor(Math.random()*9000+1000)}`;
+  const user = sess?.user;
+  const isAdmin = user?.role === "admin";
 
-  console.log(`🆘 문의 채팅 접속: ${nick}`);
+  // 유저 식별 (로그인 없으면 GuestXXXX)
+  const nick = user?.ID || `Guest${Math.floor(Math.random()*9000+1000)}`;
+  const roomId = isAdmin ? "admin" : nick;
 
+  if (!isAdmin) {
+    socket.join(roomId);
+    if (!supportRooms[roomId]) supportRooms[roomId] = [];
+    console.log(`🆘 문의 접속: ${nick} (방: ${roomId})`);
+    // 기존 대화 내역 보내주기
+    supportRooms[roomId].forEach(msg => socket.emit("chat message", msg));
+  } else {
+    socket.join("admin");
+    console.log(`🛠️ 관리자 접속: ${nick}`);
+    socket.emit("room list", Object.keys(supportRooms));
+  }
+
+  // 메시지 수신
   socket.on("chat message", (msg) => {
-    const message = { user: nick, text: msg, at: Date.now() };
-    support.emit("chat message", message);
+    if (isAdmin) {
+      const { targetRoom, text } = msg;
+      if (!supportRooms[targetRoom]) supportRooms[targetRoom] = [];
+      const reply = { user: "관리자", text, at: Date.now() };
+      supportRooms[targetRoom].push(reply);
+      support.to(targetRoom).emit("chat message", reply);
+      console.log(`📩 관리자 → ${targetRoom}: ${text}`);
+    } else {
+      const message = { user: nick, text: msg, at: Date.now() };
+      supportRooms[roomId].push(message);
+      support.to(roomId).emit("chat message", message);
+      support.to("admin").emit("new message", { roomId, message });
+    }
   });
 
   socket.on("disconnect", () => {
-    console.log(`🆘 문의 채팅 종료: ${nick}`);
+    console.log(`❌ ${nick} 나감`);
   });
 });
 

@@ -47,20 +47,27 @@
       word-wrap: break-word;
       font-size: 14px;
     }
-    /* 내 메시지 */
-    .self {
+
+    /* 메시지 스타일 */
+    .guest {        /* 본인 게스트 메시지: 파란색 */
       background: #0288d1;
       color: white;
       margin-left: auto;
       border-bottom-right-radius: 4px;
     }
-    /* 상대 메시지 */
-    .other {
-      background: #e1f5fe;
-      color: #01579b;
+    .user {         /* 조합원 메시지: 연한 회색 */
+      background: #e1e1e1;
+      color: #333;
       margin-right: auto;
       border-bottom-left-radius: 4px;
     }
+    .admin {        /* 관리자 메시지: 남색 */
+      background: #003366;
+      color: white;
+      margin-right: auto;
+      border-bottom-left-radius: 4px;
+    }
+
     #form {
       display: flex;
       padding: 10px;
@@ -87,114 +94,47 @@
     button:hover {
       background: #01579b;
     }
-    /* 관리자 모드용 채팅방 리스트 */
-    #room-list {
-      height: 100px;
-      overflow-y: auto;
-      border-bottom: 1px solid #ccc;
-      padding: 8px;
-    }
-    .room {
-      padding: 6px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-bottom: 6px;
-      background: #e1f5fe;
-    }
-    .room.active {
-      background: #0288d1;
-      color: white;
-    }
   </style>
 </head>
 <body>
   <div class="chat-container">
     <header>🆘 문의 채팅</header>
-    <!-- 관리자 전용: 채팅방 리스트 -->
-    <div id="room-list" style="display:none"></div>
-
-    <!-- 메시지 표시 -->
     <ul id="messages"></ul>
-
-    <!-- 입력창 -->
     <form id="form">
-      <input id="input" autocomplete="off" placeholder="메시지를 입력하세요..." />
+      <input id="input" autocomplete="off" placeholder="문의 내용을 입력하세요..." />
       <button>전송</button>
     </form>
   </div>
   
   <script>
     const socket = io("/support");
-    let isAdmin = false;   // 서버에서 판별 가능 (임시 변수)
-    let currentRoom = null;
 
     const form = document.getElementById('form');
     const input = document.getElementById('input');
     const messages = document.getElementById('messages');
-    const roomList = document.getElementById('room-list');
 
-    // ✅ 일반 메시지 표시
     socket.on("chat message", (msg) => {
       const item = document.createElement("li");
       const time = new Date(msg.at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      item.textContent = `${msg.user}: ${msg.text}  (${time})`;
+      item.textContent = `${msg.text}  (${time})`;
 
-      if (msg.user === "관리자" || msg.user === "me") {
-        item.classList.add("self");
-      } else {
-        item.classList.add("other");
+      // role에 따라 클래스 지정
+      if (msg.role === "guest") {
+        item.classList.add("guest");
+      } else if (msg.role === "admin") {
+        item.classList.add("admin");
+      } else { // user
+        item.classList.add("user");
       }
 
       messages.appendChild(item);
       messages.scrollTop = messages.scrollHeight;
     });
 
-    // ✅ 관리자 전용: 방 목록 받기
-    socket.on("room list", (rooms) => {
-      isAdmin = true;
-      roomList.style.display = "block";
-      roomList.innerHTML = "";
-      rooms.forEach(r => addRoom(r));
-    });
-
-    // ✅ 새 메시지 알림 (관리자 전용)
-    socket.on("new message", ({ roomId, message }) => {
-      if (!document.getElementById("room-" + roomId)) {
-        addRoom(roomId);
-      }
-      // 새로운 메시지가 왔을 때 강조 표시
-      document.getElementById("room-" + roomId).style.fontWeight = "bold";
-    });
-
-    // ✅ 방 추가 함수 (관리자 전용)
-    function addRoom(roomId) {
-      const div = document.createElement("div");
-      div.textContent = roomId;
-      div.id = "room-" + roomId;
-      div.className = "room";
-      div.onclick = () => {
-        currentRoom = roomId;
-        // 선택 강조
-        document.querySelectorAll(".room").forEach(r => r.classList.remove("active"));
-        div.classList.add("active");
-        messages.innerHTML = "";
-      };
-      roomList.appendChild(div);
-    }
-
-    // ✅ 메시지 보내기
     form.addEventListener("submit", function(e) {
       e.preventDefault();
       if (input.value) {
-        if (isAdmin) {
-          if (!currentRoom) {
-            alert("먼저 채팅방을 선택하세요.");
-            return;
-          }
-          socket.emit("chat message", { targetRoom: currentRoom, text: input.value });
-        } else {
-          socket.emit("chat message", input.value);
-        }
+        socket.emit("chat message", input.value);
         input.value = "";
       }
     });
